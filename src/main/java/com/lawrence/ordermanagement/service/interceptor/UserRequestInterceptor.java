@@ -14,8 +14,11 @@ public class UserRequestInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String email = request.getParameter("email");
-        if (userRepository.existsByEmail(email)) return true;
-        return false;
+        if (userRepository.existsByEmail(email)){
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            return false;
+        }
+        return true;
 
     }
 }
