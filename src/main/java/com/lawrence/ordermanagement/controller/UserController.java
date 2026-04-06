@@ -3,6 +3,7 @@ package com.lawrence.ordermanagement.controller;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public UserRegistrationResponse userRegistration(@RequestBody UserRegistrationRequest userRegistrationRequest) {
+    public UserRegistrationResponse userRegistration(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
         return userService.registerUser(userRegistrationRequest);
     }
 
