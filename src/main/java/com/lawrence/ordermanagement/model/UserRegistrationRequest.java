@@ -1,11 +1,19 @@
 package com.lawrence.ordermanagement.model;
 
-import org.springframework.stereotype.Component;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Builder;
 
-@Component
+@Data
+@AllArgsConstructor
+@Builder
 public class UserRegistrationRequest {
-
-    private String username ;
+    @NotNull
+    private String username;
+    @NotNull
     private String password;
+    @Email
     private String email;
 }

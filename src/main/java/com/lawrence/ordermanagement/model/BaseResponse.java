@@ -1,17 +1,15 @@
 package com.lawrence.ordermanagement.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Component;
 
 @Component
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class BaseResponse {
 
     private boolean success;
-    private Object message ;
+    private Object message;
 
 }
