@@ -2,35 +2,69 @@ package com.lawrence.ordermanagement.service;
 
 import com.lawrence.ordermanagement.entity.User;
 import com.lawrence.ordermanagement.exceptions.UserException;
+import com.lawrence.ordermanagement.model.UserLoginRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
 import com.lawrence.ordermanagement.util.UserUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
-    @Autowired
+    private final BCryptPasswordEncoder encoder;
     UserRepository userRepository;
-    @Autowired
     UserUtils userUtils;
 
-    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest) {
+
+    public UserService(UserRepository userRepository, UserUtils userUtils, BCryptPasswordEncoder encoder) {
+        this.userRepository = userRepository;
+        this.userUtils = userUtils;
+        this.encoder = encoder;
+    }
+
+
+    public ResponseEntity<UserRegistrationResponse> registerUser(UserRegistrationRequest userRegistrationRequest) {
         UserRegistrationResponse response = new UserRegistrationResponse();
         if (userRepository.existsByEmail(userRegistrationRequest.getEmail())) {
-                throw new UserException("User already exists");
+            System.out.println("checking DB");
+            throw new UserException("User Already Exists");
         } else {
             User user = new User();
-            user.setName(userRegistrationRequest.getUsername());
+            user.setName(userRegistrationRequest.getName());
             user.setEmail(userRegistrationRequest.getEmail());
             String password = userUtils.encryptPassword(userRegistrationRequest.getPassword());
             user.setPassword(password);
             userRepository.save(user);
             response.setSuccess(true);
             response.setMessage("User registered");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
-        return response;
+
+    }
+
+    public ResponseEntity<String> userLogin(UserLoginRequest request) {
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            if (validatePassword(request.getEmail(), request.getPassword())) {
+                return new ResponseEntity<>("Login Successful", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Incorrect password", HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>("User not found, Please check email", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    public boolean validatePassword(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        String pwdFromDb = user.getPassword();
+        if (encoder.matches( password , pwdFromDb)) {
+            return true;
+        }
+        return false;
     }
 }

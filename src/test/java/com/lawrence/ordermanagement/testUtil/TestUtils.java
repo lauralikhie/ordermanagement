@@ -16,7 +16,7 @@ public class TestUtils {
     public static UserRegistrationRequest getSampleUserRegisterRequest() {
         UserRegistrationRequest request = new UserRegistrationRequest();
         request.setEmail("test@test.com");
-        request.setUsername("Suru");
+        request.setName("Suru");
         request.setPassword("lawru");
         return request;
     }

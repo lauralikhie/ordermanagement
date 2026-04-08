@@ -6,7 +6,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserUtils {
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    BCryptPasswordEncoder encoder;
+
+    public UserUtils(BCryptPasswordEncoder encoder) {
+        this.encoder = encoder;
+    }
 
     public String encryptPassword(@NotNull String password) {
         return encoder.encode(password);

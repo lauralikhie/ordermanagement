@@ -10,10 +10,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +33,8 @@ class UserControllerTest {
         response.setSuccess(true);
         response.setMessage("User registered");
         UserRegistrationRequest request = TestUtils.getSampleUserRegisterRequest();
-        when(userService.registerUser(any())).thenReturn(response);
-        response = userController.userRegistration(request);
+        when(userService.registerUser(any())).thenReturn(ResponseEntity.ok(response));
+        response = userController.userRegistration(request).getBody();
         assertEquals("User registered", response.getMessage());
         assertTrue(response.isSuccess());
     }
