@@ -17,15 +17,14 @@ public class ExceptionsHandler {
         UserRegistrationResponse response = new UserRegistrationResponse();
         response.setSuccess(false);
         response.setMessage(ex.getMessage());
-        return new ResponseEntity(response, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(response, ex.getHttpStatus());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<UserRegistrationResponse> handleInvalidRequestParams(HttpServletRequest request ,  HttpServletResponse http) {
-        System.out.println(request.toString());
+    public ResponseEntity<UserRegistrationResponse> handleInvalidRequestParams( Exception ex) {
         UserRegistrationResponse response = new UserRegistrationResponse();
         response.setSuccess(false);
-        response.setMessage("Please enter valid email, name and password");
+        response.setMessage(ex.getMessage());
         return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
     }
 }

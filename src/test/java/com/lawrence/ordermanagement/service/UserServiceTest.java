@@ -33,7 +33,7 @@ class UserServiceTest {
         UserRegistrationRequest request = TestUtils.getSampleUserRegisterRequest();
 
         when(userRepository.save(any())).thenReturn(TestUtils.getSampleUser());
-        UserRegistrationResponse response = userService.registerUser(request).getBody();
+        UserRegistrationResponse response = userService.registerUser(request);
         assertTrue(response.isSuccess());
     }
 

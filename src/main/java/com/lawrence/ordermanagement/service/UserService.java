@@ -8,7 +8,6 @@ import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
 import com.lawrence.ordermanagement.util.UserUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +26,11 @@ public class UserService {
     }
 
 
-    public ResponseEntity<UserRegistrationResponse> registerUser(UserRegistrationRequest userRegistrationRequest) {
+    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest) {
         UserRegistrationResponse response = new UserRegistrationResponse();
         if (userRepository.existsByEmail(userRegistrationRequest.getEmail())) {
             System.out.println("checking DB");
-            throw new UserException("User Already Exists");
+            throw new UserException("User Already Exists", HttpStatus.CONFLICT);
         } else {
             User user = new User();
             user.setName(userRegistrationRequest.getName());
@@ -41,28 +40,28 @@ public class UserService {
             userRepository.save(user);
             response.setSuccess(true);
             response.setMessage("User registered");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return response ;
         }
 
     }
 
-    public ResponseEntity<String> userLogin(UserLoginRequest request) {
+    public String userLogin(UserLoginRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             if (validatePassword(request.getEmail(), request.getPassword())) {
-                return new ResponseEntity<>("Login Successful", HttpStatus.OK);
+                return "Login Successful";
             } else {
-                return new ResponseEntity<>("Incorrect password", HttpStatus.UNAUTHORIZED);
+                throw new UserException("Incorrect password", HttpStatus.UNAUTHORIZED);
             }
         } else {
-            return new ResponseEntity<>("User not found, Please check email", HttpStatus.NOT_FOUND);
+            throw new UserException("User not found, Please check email", HttpStatus.NOT_FOUND);
         }
     }
 
     public boolean validatePassword(String email, String password) {
         User user = userRepository.findByEmail(email);
         String pwdFromDb = user.getPassword();
-        if (encoder.matches( password , pwdFromDb)) {
+        if (encoder.matches(password, pwdFromDb)) {
             return true;
         }
         return false;

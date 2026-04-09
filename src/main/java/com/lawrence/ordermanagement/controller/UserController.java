@@ -1,10 +1,12 @@
 package com.lawrence.ordermanagement.controller;
 
+import com.lawrence.ordermanagement.exceptions.UserException;
 import com.lawrence.ordermanagement.model.UserLoginRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +22,12 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<UserRegistrationResponse> userRegistration(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
-        System.out.println("controlled reached");
-        return userService.registerUser(userRegistrationRequest);
+        return new ResponseEntity<>(userService.registerUser(userRegistrationRequest), HttpStatus.CREATED);
     }
 
     @GetMapping("/login")
-    public ResponseEntity<String> userLogin(@RequestBody UserLoginRequest request){
-        return userService.userLogin(request);
+    public ResponseEntity<String> userLogin(@RequestBody UserLoginRequest request) {
+        return new ResponseEntity<>(userService.userLogin(request), HttpStatus.OK);
 
     }
 

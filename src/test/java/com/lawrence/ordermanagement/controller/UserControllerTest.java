@@ -1,5 +1,7 @@
 package com.lawrence.ordermanagement.controller;
 
+import com.lawrence.ordermanagement.entity.User;
+import com.lawrence.ordermanagement.model.UserLoginRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
@@ -33,9 +35,19 @@ class UserControllerTest {
         response.setSuccess(true);
         response.setMessage("User registered");
         UserRegistrationRequest request = TestUtils.getSampleUserRegisterRequest();
-        when(userService.registerUser(any())).thenReturn(ResponseEntity.ok(response));
+        when(userService.registerUser(any())).thenReturn(response);
         response = userController.userRegistration(request).getBody();
+        assert response != null;
         assertEquals("User registered", response.getMessage());
         assertTrue(response.isSuccess());
+    }
+
+    @Test
+    public void ValidateUserLogin() {
+        UserLoginRequest userLoginRequest = UserLoginRequest
+                .builder()
+                .email("lawrence@goodguy.com")
+                .password("password").build();
+        ResponseEntity<String> response = userController.userLogin(userLoginRequest);
     }
 }
