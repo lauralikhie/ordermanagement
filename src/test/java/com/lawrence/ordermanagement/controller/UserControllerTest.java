@@ -2,6 +2,7 @@ package com.lawrence.ordermanagement.controller;
 
 import com.lawrence.ordermanagement.entity.User;
 import com.lawrence.ordermanagement.model.UserLoginRequest;
+import com.lawrence.ordermanagement.model.UserLoginResponse;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
@@ -48,6 +49,6 @@ class UserControllerTest {
                 .builder()
                 .email("lawrence@goodguy.com")
                 .password("password").build();
-        ResponseEntity<String> response = userController.userLogin(userLoginRequest);
+        ResponseEntity<UserLoginResponse> response = userController.userLogin(userLoginRequest);
     }
 }

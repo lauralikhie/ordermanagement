@@ -3,6 +3,7 @@ package com.lawrence.ordermanagement.service;
 import com.lawrence.ordermanagement.entity.User;
 import com.lawrence.ordermanagement.exceptions.UserException;
 import com.lawrence.ordermanagement.model.UserLoginRequest;
+import com.lawrence.ordermanagement.model.UserLoginResponse;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
@@ -10,6 +11,8 @@ import com.lawrence.ordermanagement.util.UserUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import static com.lawrence.ordermanagement.UserConstants.*;
 
 @Service
 public class UserService {
@@ -29,41 +32,38 @@ public class UserService {
     public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest) {
         UserRegistrationResponse response = new UserRegistrationResponse();
         if (userRepository.existsByEmail(userRegistrationRequest.getEmail())) {
-            System.out.println("checking DB");
-            throw new UserException("User Already Exists", HttpStatus.CONFLICT);
+            throw new UserException(USER_ALEADY_EXISTS, HttpStatus.CONFLICT);
         } else {
             User user = new User();
             user.setName(userRegistrationRequest.getName());
+            if (!userUtils.validate(userRegistrationRequest.getEmail())) {
+                throw new UserException(INVALID_EMAIL_FORMAT, HttpStatus.BAD_REQUEST);
+            }
             user.setEmail(userRegistrationRequest.getEmail());
             String password = userUtils.encryptPassword(userRegistrationRequest.getPassword());
             user.setPassword(password);
             userRepository.save(user);
             response.setSuccess(true);
             response.setMessage("User registered");
-            return response ;
+            return response;
         }
 
     }
 
-    public String userLogin(UserLoginRequest request) {
-
-        if (userRepository.existsByEmail(request.getEmail())) {
-            if (validatePassword(request.getEmail(), request.getPassword())) {
-                return "Login Successful";
-            } else {
-                throw new UserException("Incorrect password", HttpStatus.UNAUTHORIZED);
-            }
-        } else {
-            throw new UserException("User not found, Please check email", HttpStatus.NOT_FOUND);
+    public UserLoginResponse userLogin(UserLoginRequest request) {
+        UserLoginResponse response = new UserLoginResponse();
+        User user = userRepository.findByEmail(request.getEmail());
+        if (user == null) {
+            throw new UserException(INVALID_CREDENTIALS, HttpStatus.NOT_FOUND);
         }
-    }
-
-    public boolean validatePassword(String email, String password) {
-        User user = userRepository.findByEmail(email);
         String pwdFromDb = user.getPassword();
-        if (encoder.matches(password, pwdFromDb)) {
-            return true;
+        if (encoder.matches(request.getPassword(), pwdFromDb)) {
+            response.setMessage("Login Successful");
+            response.setSuccess(true);
+            return response;
+        } else {    
+            throw new UserException(INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
         }
-        return false;
     }
+
 }

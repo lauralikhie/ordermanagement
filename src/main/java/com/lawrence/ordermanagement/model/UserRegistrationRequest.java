@@ -24,7 +24,6 @@ public class UserRegistrationRequest {
     @Size(min = 8, message = "password needs to be altease 8 characters")
     private String password;
 
-    @Email(message = "invalid email format")
     @NotNull
     private String email;
 }

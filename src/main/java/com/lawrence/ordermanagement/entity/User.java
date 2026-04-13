@@ -21,4 +21,8 @@ public class User {
     private String email;
     private String password;
 
+    public void setEmail(String email) {
+        this.email = email != null ? email.trim() : null;
+    }
+
 }
