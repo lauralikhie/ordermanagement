@@ -11,8 +11,8 @@ import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
 
-    private String username;
-    private String password;
+    private final String username;
+    private final String password;
 
     public UserPrincipal(String username, String password) {
         this.username = username;
@@ -26,12 +26,12 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return username;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return password;
+        return username;
     }
 
     @Override
