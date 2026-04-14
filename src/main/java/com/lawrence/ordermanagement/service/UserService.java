@@ -7,8 +7,10 @@ import com.lawrence.ordermanagement.model.UserLoginResponse;
 import com.lawrence.ordermanagement.model.UserRegistrationRequest;
 import com.lawrence.ordermanagement.model.UserRegistrationResponse;
 import com.lawrence.ordermanagement.repository.UserRepository;
+import com.lawrence.ordermanagement.util.JwtUtil;
 import com.lawrence.ordermanagement.util.UserUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +22,17 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     UserRepository userRepository;
     UserUtils userUtils;
+    JwtUtil jwtUtil;
+    AuthenticationManager authenticationManager;
 
 
-    public UserService(UserRepository userRepository, UserUtils userUtils, BCryptPasswordEncoder encoder) {
+    public UserService(UserRepository userRepository, UserUtils userUtils,
+                       BCryptPasswordEncoder encoder,
+                       JwtUtil jwtUtil,
+                       AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
         this.userUtils = userUtils;
         this.encoder = encoder;
     }
@@ -58,10 +67,10 @@ public class UserService {
         }
         String pwdFromDb = user.getPassword();
         if (encoder.matches(request.getPassword(), pwdFromDb)) {
-            response.setMessage("Login Successful");
+            response.setMessage(jwtUtil.generateToken(request.getEmail()));
             response.setSuccess(true);
             return response;
-        } else {    
+        } else {
             throw new UserException(INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
         }
     }
